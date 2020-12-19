@@ -1,8 +1,9 @@
 module JsonParser where
 
-import           Control.Applicative (Alternative (..), some, (<|>))
+import           Control.Applicative (Alternative (..), (<|>))
 import           Data.Char           (isDigit)
 import qualified Data.Map.Strict     as M
+import           Data.Tuple          (swap)
 
 data JsonValue = JsonNull
                | JsonBool Bool
@@ -44,8 +45,7 @@ stringP :: String -> Parser String
 stringP = traverse charP
 
 spanP :: (Char -> Bool) -> Parser String
--- spanP pred = Parser $ Just . uncurry (flip (,)) . span pred
-spanP pred = Parser $ \input -> let (x, input') = span pred input in Just (input', x)
+spanP pred = Parser $ Just . swap . span pred
 
 between :: Parser a -> Parser b -> Parser c -> Parser b
 between betweenLeft p betweenRight = betweenLeft *> p <* betweenRight
